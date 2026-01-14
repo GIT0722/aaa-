@@ -3,283 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salesforce Certification Mastery</title>
+    <title>Agentforce Specialist Mastery - 100 Qs</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
-        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f1f5f9; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f1f5f9; color: #1e293b; overflow-x: hidden; }
         .option-btn:disabled { cursor: not-allowed; }
-        .progress-bar { transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .exam-card:hover { transform: translateY(-5px); transition: 0.3s; }
+        .progress-bar { transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .exam-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .dashboard-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .modal-overlay { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(5px); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 md:p-8">
 
-    <!-- Header -->
-    <header class="w-full max-w-3xl mb-8 text-center">
-        <h1 class="text-3xl font-black text-slate-800 mb-2 tracking-tight">
-            <i class="fas fa-cloud text-blue-500 mr-2"></i>Salesforce Mastery
+    <header class="w-full max-w-5xl mb-6 flex justify-between items-center px-2">
+        <h1 onclick="location.reload()" class="text-xl md:text-3xl font-black text-slate-800 cursor-pointer flex items-center gap-2">
+            <i class="fas fa-robot text-blue-600"></i>
+            <span>Agentforce <span class="text-blue-600">Specialist</span></span>
         </h1>
-        <p class="text-slate-500 text-sm font-bold tracking-widest uppercase">Certification Prep Portal</p>
+        <div class="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-200">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Wrong</span>
+            <span id="header-wrong-count" class="text-lg font-black text-red-500 ml-2">0</span>
+        </div>
     </header>
 
-    <!-- Main Content -->
-    <main id="app-container" class="w-full max-w-3xl">
-        
-        <!-- Selection Screen -->
-        <div id="selection-screen" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Exam A -->
-            <div onclick="quizApp.selectExam('agentforce')" class="exam-card bg-white rounded-3xl shadow-xl p-8 border-t-8 border-blue-600 cursor-pointer hover:shadow-2xl transition">
-                <div class="text-blue-600 text-5xl mb-6"><i class="fas fa-robot"></i></div>
-                <h2 class="text-xl font-bold mb-2">Agentforce Specialist</h2>
-                <p class="text-slate-500 text-sm mb-6">Salesforce AI、エージェント構築、Trust Layerに関する100問。</p>
-                <span class="inline-flex items-center text-blue-600 font-bold">試験を解く <i class="fas fa-chevron-right ml-2 text-xs"></i></span>
-            </div>
-            <!-- Exam B -->
-            <div onclick="quizApp.selectExam('admin')" class="exam-card bg-white rounded-3xl shadow-xl p-8 border-t-8 border-cyan-500 cursor-pointer hover:shadow-2xl transition">
-                <div class="text-cyan-500 text-5xl mb-6"><i class="fas fa-user-shield"></i></div>
-                <h2 class="text-xl font-bold mb-2">Administrator</h2>
-                <p class="text-slate-500 text-sm mb-6">標準機能、セキュリティ、データ管理、自動化に関する100問。</p>
-                <span class="inline-flex items-center text-cyan-500 font-bold">試験を解く <i class="fas fa-chevron-right ml-2 text-xs"></i></span>
-            </div>
-        </div>
+    <main id="app-container" class="w-full max-w-5xl">
+        <!-- Dashboard Screen -->
+        <div id="selection-screen" class="space-y-6 animate-fade-in">
+            <section class="dashboard-card rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden">
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div>
+                        <h2 class="text-sm font-black text-blue-400 uppercase tracking-[0.2em] mb-1">Overall Status</h2>
+                        <p class="text-3xl font-black">学習進捗ダッシュボード</p>
+                    </div>
+                    <div class="flex gap-10">
+                        <div class="text-center">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">回答数</span>
+                            <span id="dash-total-attempts" class="text-3xl font-black text-white">0</span>
+                        </div>
+                        <div class="text-center border-l border-slate-800 pl-10">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">正解率</span>
+                            <span id="dash-overall-accuracy" class="text-3xl font-black text-green-400">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-        <!-- Mode Screen (Hidden by default) -->
-        <div id="mode-screen" class="hidden bg-white rounded-3xl shadow-xl p-10 text-center border border-slate-200">
-            <button onclick="quizApp.backToSelection()" class="text-slate-400 hover:text-slate-600 mb-4 block mx-auto"><i class="fas fa-arrow-left"></i> 試験選択に戻る</button>
-            <h2 id="selected-exam-title" class="text-2xl font-black mb-6">試験名</h2>
-            <div class="flex flex-col space-y-4 max-w-xs mx-auto">
-                <button onclick="quizApp.start(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg transition">
-                    最初から解く (No.1〜)
+            <section id="review-section" class="hidden p-6 bg-red-50 rounded-3xl border-2 border-red-100 shadow-sm flex items-center justify-between gap-4">
+                <div class="flex items-center gap-4 text-slate-800">
+                    <i class="fas fa-redo-alt text-2xl text-red-600"></i>
+                    <div>
+                        <h3 class="font-black">ニガテ克服コース</h3>
+                        <p class="text-xs text-slate-500">ミスした問題が <span id="failed-count-display">0</span> 問あります。</p>
+                    </div>
+                </div>
+                <button onclick="quizApp.startReview()" class="bg-red-600 text-white font-black py-3 px-8 rounded-xl">復習開始</button>
+            </section>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <button onclick="quizApp.start(false)" class="bg-white rounded-[2rem] p-8 shadow-lg border-b-8 border-slate-900 text-left hover:-translate-y-2 transition">
+                    <i class="fas fa-play text-blue-600 text-2xl mb-4"></i>
+                    <h3 class="text-xl font-black mb-2 tracking-tighter">1問目から解く</h3>
+                    <p class="text-xs text-slate-400">全100問のフルマラソンコースです。</p>
                 </button>
-                <button onclick="quizApp.start(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-4 rounded-2xl transition">
-                    ランダムに出題
+                <button onclick="quizApp.start(true)" class="bg-white rounded-[2rem] p-8 shadow-lg border-b-8 border-blue-600 text-left hover:-translate-y-2 transition">
+                    <i class="fas fa-random text-blue-600 text-2xl mb-4"></i>
+                    <h3 class="text-xl font-black mb-2 tracking-tighter">ランダムに出題</h3>
+                    <p class="text-xs text-slate-400">実戦形式でシャッフル出題します。</p>
                 </button>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest pl-2">Categories (Drill Mode)</h3>
+                <div id="category-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
             </div>
         </div>
 
         <!-- Quiz Screen -->
-        <div id="quiz-screen" class="hidden">
-            <div class="flex justify-between items-end mb-3 px-1">
-                <span id="progress-text" class="text-xs font-black text-slate-400 tracking-widest uppercase">Q 1/100</span>
-                <span id="score-text" class="text-sm font-black text-blue-600">正解率: 0%</span>
+        <div id="quiz-screen" class="hidden animate-fade-in w-full">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-3">
+                    <button onclick="quizApp.showQuitModal()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times-circle text-2xl"></i></button>
+                    <span id="progress-text" class="text-xl font-black">QUESTION 1/100</span>
+                </div>
+                <span id="score-text" class="text-2xl font-black text-blue-600 italic">0%</span>
             </div>
-            <div class="w-full bg-slate-200 h-2 rounded-full mb-8 overflow-hidden">
+            <div class="w-full bg-slate-200 h-3 rounded-full mb-8 overflow-hidden shadow-inner">
                 <div id="progress-bar" class="progress-bar bg-blue-600 h-full w-0"></div>
             </div>
 
-            <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-10 border border-slate-100">
-                <div id="category-badge" class="inline-block px-3 py-1 rounded-lg bg-blue-50 text-blue-600 text-xs font-black mb-6 tracking-tighter">CATEGORY</div>
-                <h3 id="question-text" class="text-lg md:text-xl font-bold text-slate-800 mb-10 leading-relaxed"></h3>
-
-                <div id="options-container" class="space-y-4"></div>
-
-                <!-- Explanation Area -->
+            <div class="bg-white rounded-[3rem] shadow-2xl p-6 md:p-12 border border-slate-100">
+                <div id="category-badge" class="inline-block px-4 py-1.5 rounded-xl bg-blue-50 text-blue-600 text-[10px] font-black mb-8 uppercase tracking-widest border border-blue-100 italic">CATEGORY</div>
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 mb-10 leading-snug"></h3>
+                <div id="options-container" class="grid grid-cols-1 gap-4 mb-8"></div>
                 <div id="explanation-container" class="hidden mt-10 pt-10 border-t-2 border-slate-50">
-                    <div id="result-badge" class="flex items-center mb-6 font-black text-xl italic"></div>
-                    <div id="explanation-text" class="text-slate-600 text-sm md:text-base leading-relaxed whitespace-pre-wrap bg-slate-50 p-6 rounded-2xl border border-slate-100 font-medium"></div>
-                    <button onclick="quizApp.nextQuestion()" class="mt-8 w-full bg-slate-900 hover:bg-black text-white font-bold py-5 rounded-2xl transition shadow-xl transform active:scale-95">
-                        次の問題へ <i class="fas fa-arrow-right ml-2"></i>
+                    <div id="result-badge" class="flex items-center p-6 rounded-2xl mb-6 font-black text-lg"></div>
+                    <div id="explanation-text" class="text-slate-600 text-sm md:text-base leading-relaxed whitespace-pre-wrap bg-slate-50 p-6 rounded-2xl border border-slate-100 italic"></div>
+                    <button onclick="quizApp.nextQuestion()" class="mt-8 w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl transition shadow-xl transform active:scale-95 flex items-center justify-center gap-2">
+                        <span>次の問題へ</span> <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Result Screen -->
-        <div id="result-screen" class="hidden bg-white rounded-3xl shadow-2xl p-12 text-center border border-slate-200">
-            <h2 class="text-3xl font-black mb-4">COMPLETE!</h2>
-            <div class="text-8xl my-10" id="final-emoji">🏆</div>
-            <div class="text-5xl font-black text-blue-600 mb-2" id="final-score">0%</div>
-            <p class="text-slate-400 font-bold mb-10 tracking-widest" id="final-stats"></p>
-            <button onclick="location.reload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl transition shadow-lg">
-                トップに戻る
-            </button>
+        <div id="result-screen" class="hidden space-y-8 animate-fade-in pb-20">
+            <div class="bg-white rounded-[3rem] shadow-2xl p-10 md:p-16 text-center">
+                <h2 class="text-3xl font-black text-slate-400 uppercase tracking-widest mb-4">Finish</h2>
+                <div id="final-emoji" class="text-8xl my-10">🏆</div>
+                <div id="final-score" class="text-7xl font-black text-blue-600 mb-4 tracking-tighter">0%</div>
+                <p id="final-stats" class="text-slate-400 font-bold mb-12 uppercase tracking-widest"></p>
+                
+                <div class="text-left border-t pt-10 mt-10">
+                    <h3 class="text-xl font-black mb-8 flex items-center gap-3"><i class="fas fa-chart-pie text-blue-500"></i> 強み・弱み分析</h3>
+                    <div class="overflow-hidden rounded-2xl border border-slate-100">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b border-slate-100">
+                                <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                    <th class="p-4">カテゴリ</th>
+                                    <th class="p-4">正解率 / 判定</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analysis-table-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <button onclick="location.reload()" class="mt-12 bg-slate-900 text-white font-black py-5 px-10 rounded-2xl shadow-xl w-full md:w-auto transition hover:bg-black">メニューに戻る</button>
+            </div>
         </div>
     </main>
 
+    <div id="quit-modal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] p-10 max-w-sm w-full shadow-2xl animate-fade-in text-center">
+            <div class="text-red-500 text-6xl mb-6"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3 class="text-2xl font-black mb-4">学習を中断しますか？</h3>
+            <p class="text-slate-500 mb-8 text-sm">現在の回答結果は保存されます。</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="quizApp.hideQuitModal()" class="bg-slate-100 text-slate-600 font-black py-4 rounded-xl">続ける</button>
+                <button onclick="quizApp.quitQuiz()" class="bg-red-600 text-white font-black py-4 rounded-xl shadow-lg">中断する</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // --- DATA SECTION ---
-        const EXAM_DATABASE = {
-            agentforce: {
-                title: "Agentforce Specialist",
-                color: "blue",
-                questions: [
-                    { id: 1, cat: "Agentforce 基本", q: "Agentforceの推論エンジンがこのトピックを選択するために使用する情報はどれですか？", a: "トピック名と分類の説明", b: "トピック名とスコープ", c: "分類の説明とスコープ", correct: "C", exp: "Cが正解：推論エンジンは「分類の説明（何ができるか）」と「スコープ（実行時の制約）」を利用します。" },
-                    { id: 2, cat: "生成AI機能", q: "推奨される記事に基づいて生成AIによる返信を提供するSalesforceの機能はどれですか？", a: "Einstein 返信のおすすめ", b: "Einstein サービス返信", c: "Einstein グラウンディング", correct: "B", exp: "Bが正解：Einstein サービス返信はナレッジ等に基づき自動で返信を「生成」する機能です。" },
-                    { id: 3, cat: "実装設計", q: "ノーコードツールのみで、CRMやData Cloudの履歴に基づき営業の要約を行うには？", a: "標準の基盤モデルを使用し、グラウンディングされたプロンプトテンプレートを使用する。", b: "標準の基盤モデルをファインチューニングする。", c: "独自のカスタム基盤モデルをデプロイする。", correct: "A", exp: "Aが正解：プロンプトテンプレートとグラウンディング（RAG）はノーコードで完結します。" },
-                    // ... (Agentforceの100問がここに入ります)
-                    // スペースの都合上、一部抜粋。実際は100問完全に動作します
-                ]
-            },
-            admin: {
-                title: "Salesforce Administrator",
-                color: "cyan",
-                questions: [
-                    { id: 1, cat: "営業およびマーケティングアプリケーション", q: "Salesforceの取引先責任者の役割について、次の記述は正しいですか? 取引先責任者の役割は、取引先責任者レコードごとに1つだけ割り当てることができる。", a: "正", b: "誤", c: "どちらでもない", correct: "B", exp: "Bが正解：Salesforceでは、取引先責任者の役割は一人の取引先責任者に対して複数割り当てることができます。" },
-                    { id: 2, cat: "オブジェクトマネージャと App Builder", q: "取引先レコードに特定の条件を満たした場合のみ表示される新しいセクションを追加したい。どの機能を使用するべきですか?", a: "ページレイアウト", b: "レコードタイプ", c: "ライトニングコンポーネント", d: "バリデーションルール", correct: "C", exp: "Cが正解：ライトニングコンポーネント（動的表示設定）を用いることで、条件に基づいたUI制御が可能です。" },
-                    { id: 3, cat: "データと分析の管理", q: "Salesforceのレポートスケジューリングに関する記述で正しいものはどれですか?", a: "毎週月曜日のみスケジュールすることはできない", b: "スケジュールには少なくとも「編集者」権限が必要", c: "任意のユーザーに制限なく送信可能", d: "PDF形式でのみ受け取り可能", correct: "B", exp: "Bが正解：レポートをスケジュールするには編集権限が必要です。" },
-                    { id: 4, cat: "データと分析の管理", q: "ダッシュボードにおいて、ユーザーに最適なビジュアル表現を提供するために実施できるアクションはどれですか？(2つ選択)", a: "静的なフィルターを適用する", b: "各ユーザーが自分のデータで表示できるようにする", c: "カスタムリダイレクトを使用する", d: "ダッシュボードをスケジュール送信する", correct: "B, D", exp: "B・Dが正解：パーソナライズ（動的表示）と定期共有が最適な提供方法です。" },
-                    { id: 5, cat: "データと分析の管理", q: "ダッシュボードを効率的に利用するために行うことができる2つのアクションは何ですか？", a: "外部オブジェクトを直接ソースにする", b: "ダイナミックダッシュボードを作成する", c: "スケジュールしてメール送信する", d: "カスタムJavaScriptでビジュアル作成", correct: "B, C", exp: "B・Cが正解：ダイナミックダッシュボードとメール送信が効率化に寄与します。" },
-                    { id: 6, cat: "組織の設定 / セキュリティ", q: "共通のキーワードを検索すると、2人の異なるユーザーが常に同じ検索結果を取得しますか?", a: "はい", b: "いいえ", c: "管理者のみはい", correct: "B", exp: "Bが正解：アクセス権、プロファイル、役割に基づき、ユーザーごとに異なる結果が表示されます。" },
-                    { id: 7, cat: "営業およびマーケティングアプリケーション", q: "新しい営業プロセスの導入に際して、管理者が最初に設定すべき重要な機能は？", a: "カスタムレポートタイプ", b: "ワークフロールール", c: "商談ステージのカスタマイズ", d: "プロファイルの更新", correct: "C", exp: "Cが正解：プロセス自体の基本的な構造である「商談ステージ」をまず定義する必要があります。" },
-                    { id: 8, cat: "組織の設定 / アプリケーション管理", q: "カスタムアプリを作成するプロセスはどのようなものですか?", a: "オブジェクト作成、ロゴ選択、プロファイル作成", b: "アプリ作成、ロゴ選択、プロファイル割り当て", c: "タブ作成、レポート設定、ダッシュボード構築", correct: "B", exp: "Bが正解：標準的な手順は、アプリの定義、ブランディング、アクセスの割り当てです。" },
-                    { id: 9, cat: "データと分析の管理 / 生産性", q: "ユーザーエクスペリエンスとデータの整合性を向上させるため、利用が推奨される機能は？", a: "積み上げ集計項目", b: "バリデーションルール", c: "プロセスビルダー", d: "カスタムレポートタイプ", correct: "B", exp: "Bが正解：バリデーションルールによりデータの整合性を強制し、品質を維持できます。" },
-                    { id: 10, cat: "データと分析の管理", q: "レポートと同じレポートに基づくダッシュボードで、ユーザーが異なるデータセットを表示することは可能ですか?", a: "はい", b: "いいえ", c: "管理者のみ可能", correct: "A", exp: "Aが正解：実行ユーザーを「ダッシュボード閲覧者」に設定することで、各々の権限に応じたデータが表示されます。" },
-                    { id: 11, cat: "営業およびマーケティングアプリケーション", q: "営業プロセス実装時、商談ステージに関連する設定として正しいものは？(2つ選択)", a: "プロセスビルダーで自動化設定", b: "商談ステージを含む営業プロセスを作成しレコードタイプに割当", c: "全ページにセクション追加", d: "カスタム項目の作成", correct: "A, B", exp: "A・Bが正解：自動化の定義と、レコードタイプによるステージの出し分けが重要です。" },
-                    { id: 12, cat: "データと分析の管理", q: "Salesforceのレポートについて、正しいものを1つ選びなさい。", a: "組織外のデータを直接取得できる", b: "集計項目は使用できない", c: "最大3つのレポートタイプを組み合わせ可能", d: "カスタムオブジェクトのデータを含めることができる", correct: "D", exp: "Dが正解：標準だけでなくカスタムオブジェクトもレポートに含めることが可能です。" },
-                    { id: 13, cat: "生産性とコラボレーション", q: "営業チームが取引先データに迅速にアクセスするために効果的な機能は？(2つ選択)", a: "カスタムリストビュー", b: "ダッシュボード", c: "カスタムナビゲーションメニュー", d: "カスタムオブジェクトの作成", correct: "A, C", exp: "A・Cが正解：リストビューとナビゲーションメニューの最適化が最も直接的です。" },
-                    { id: 14, cat: "オブジェクトマネージャと App Builder", q: "電話番号とメールアドレスが一目でわかるように表示させたい。実装すべき2つの方法は？", a: "レコードページにカスタムコンポーネント", b: "ページレイアウトの編集（上部に配置）", c: "レポートでの要約", d: "コンパクトレイアウトのカスタマイズ", correct: "B, D", exp: "B・Dが正解：レイアウトの調整と、ハイライト表示用コンパクトレイアウトが有効です。" },
-                    { id: 15, cat: "データと分析の管理", q: "カスタムレポートタイプ作成時、設定可能な2つの要素は？", a: "デフォルトフィルタ", b: "オブジェクト間の関係", c: "最大表示レコード数", d: "項目のカスタムラベル", correct: "A, B", exp: "A・Bが正解：フィルタのデフォルトと、基盤となるオブジェクト関係を定義します。" },
-                    { id: 16, cat: "オブジェクトマネージャと App Builder", q: "レコードページのコンポーネントは、プロファイル設定に基づき自動的に調整されますか?", a: "正しい", b: "誤り", c: "どちらでもない", correct: "B", exp: "Bが正解：自動ではなく、アプリビルダー内で明示的に設定（割り当て）する必要があります。" },
-                    { id: 17, cat: "セキュリティとアクセス", q: "Salesforceのセキュリティモデルについて、正しいものを選びなさい。", a: "OWDはオブジェクトレベルで設定できる", b: "権限セットは基本的なアクセス権を定義する", c: "プロファイルは公開グループ数を制限する", d: "ロールはデータアクセスに影響しない", correct: "A", exp: "Aが正解：OWD（組織全体のデフォルト）はオブジェクト単位の設定です。" },
-                    { id: 18, cat: "営業およびマーケティングアプリケーション", q: "リード変換時に値を引き継ぐために管理者が行うべきことは？(2つ選択)", a: "リードで選択リストを必須にする", b: "選択リスト項目を取引先責任者にマッピングする", c: "入力規則で更新", d: "取引先責任者にカスタム選択リストを作成する", correct: "B, D", exp: "B・Dが正解：受皿となる項目の作成と、マッピング設定が必要です。" },
-                    { id: 19, cat: "セキュリティとアクセス", q: "Salesforceのセキュリティモデルは、共有ルールのみに依存していますか?", a: "正", b: "誤", c: "一部正解", correct: "B", exp: "Bが正解：OWD、プロファイル、役割階層など、多層的な仕組みで構成されています。" },
-                    { id: 20, cat: "オブジェクトマネージャと App Builder", q: "リストビューについて正しいものを1つ選びなさい。", a: "レポートと同じ機能", b: "一度作ると編集不可", c: "標準オブジェクトのみ", d: "条件を満たすレコードの表示に使用", correct: "D", exp: "Dが正解：特定の条件でレコードを絞り込み、素早くアクセスするために使われます。" },
-                    // (以下、100問目まで継続して統合されています...)
-                    { id: 100, cat: "RAG / PII", q: "個人識別情報（PII）を含む情報のRAGにおけるベストプラクティスは？", a: "プロンプト指示に依存する", b: "PIIをそのままインデックス化する", c: "機密項目をマスクし、PII以外のみをインデックス化する", correct: "C", exp: "Cが正解：インデックス作成前にマスクすることが、物理的な漏洩を防ぐ最善策です。" }
-                ]
-            }
-        };
+        const RAW_DATA = [
+            { id: 1, cat: "Agentforce 基本", q: "Agentforceの推論エンジンがこのトピックを選択するために使用する情報はどれですか？", a: "A. トピック名と分類の説明", b: "B. トピック名とスコープ", c: "C. 分類の説明とスコープ", correct: "C", exp: "Cが正解：推論エンジンは「分類の説明」と「スコープ」を利用します。\nトピック名はラベルに過ぎません。" },
+            { id: 2, cat: "生成AI機能", q: "推奨記事に基づき生成AIによる返信やEメールの下書きを提供する機能は？", a: "A. Einstein 返信のおすすめ", b: "B. Einstein サービス返信", c: "C. Einstein グラウンディング", correct: "B", exp: "Bが正解：Einstein サービス返信はService GPTの一部で回答を「生成」します。\nAは推奨のみ。Cはプロセスの名称です。" },
+            { id: 3, cat: "実装設計", q: "ノーコードのみで、CRMやData Cloudの履歴に基づき電話準備を支援するには？", a: "A. 標準の基盤モデルとグラウンディングされたテンプレートを使用", b: "B. ファインチューニング", c: "C. BYOMデプロイ", correct: "A", exp: "Aが正解：グラウンディング（RAG）はコードを書かずに特定のデータに基づいた要約が可能です。" },
+            { id: 4, cat: "Agentforce", q: "キャンセル実行と、再予約に関する記事の確認を同時に達成する機能は？", a: "A. フロー起動", b: "B. アクションに基づきToDo実行とナレッジ回答", c: "C. 記事生成", correct: "B", exp: "Bが正解：Agentforceはアクション実行とナレッジ参照を同時に行える設計です。" },
+            { id: 5, cat: "実装設計", q: "（再掲）ノーコードツールのみで、履歴や会話要約を提供し電話準備を支援するには？", a: "A. BYOM", b: "B. ファインチューニング", c: "C. グラウンディングされたプロンプトテンプレート", correct: "C", exp: "Cが正解：リアルタイムにデータをAIに提供できる唯一のノーコードアプローチです。" },
+            { id: 6, cat: "デプロイ", q: "サンドボックスから本番へのデプロイでエラーが発生する原因は？", a: "A. カスタムLLM指定なし", b: "B. BYOLLM未サポート", c: "C. LLMの名前が環境間で不一致", correct: "C", exp: "Cが正解：テンプレートはLLMのAPI参照名を保持するため、名前の不一致は参照解決エラーとなります。" },
+            { id: 7, cat: "音声AI", q: "「Call Explorer」有効化の前に割り当てる必要がある権限セットは？", a: "A. 設定不要", b: "B. カスタムアクション", c: "C. Einstein 会話インサイト権限セット", correct: "C", exp: "Cが正解：Call ExplorerはECIの一部であり、権限セットの割り当てが必須です。" },
+            { id: 8, cat: "Einstein Studio", q: "外部基盤モデルに接続を推奨するビジネス要件はどれ？", a: "A. 温度調整", b: "B. 自社データでファインチューニングされたモデルを求めている", c: "C. 頻度ペナルティ変更", correct: "B", exp: "Bが正解：外部で学習させた独自モデル(BYOM)を利用するためのハブがEinstein Studioです。" },
+            { id: 9, cat: "アクション", q: "成功したやり取りに基づきパーソナライズされたEメール作成を支援するのは？", a: "A. 類似商談検索", b: "B. 営業Eメールの下書きまたは修正", c: "C. レコード要約", correct: "B", exp: "Bが正解：営業のコンテキストに特化した生成AIアクションです。" },
+            { id: 10, cat: "プロンプト管理", q: "プロンプトテンプレートが「イミュータブル」とはどういう意味？", a: "A. 最新のみ有効", b: "B. 自動保存", c: "C. 有効化された後は変更保存不可", correct: "C", exp: "Cが正解：有効化された版は編集できず、変更には新バージョンが必要です。" },
+            { id: 11, cat: "デプロイ", q: "Agentforceから呼び出すApexをデプロイする際、コードカバレッジは何%必要？", a: "A. 75%", b: "B. 不要", correct: "A", exp: "Aが正解：標準要件である75%以上が常に強制されます。" },
+            { id: 12, cat: "テスト", q: "テストセンター実行中にデータを変更しないためのベストプラクティスは？", a: "A. 本番環境", b: "B. テスト制限", c: "C. サンドボックス環境のみで使用", correct: "C", exp: "Cが正解：隔離された環境でのテストが唯一の安全策です。" },
+            { id: 13, cat: "音声AI", q: "通話からインサイトを得るための設定として欠かせないのは？", a: "A. ECI有効化と録音プロバイダー接続", b: "B. カスタムアクション", correct: "A", exp: "Aが正解：録音プロバイダーの接続がデータ取り込みの基盤となります。" },
+            { id: 14, cat: "監視/改善", q: "テンプレートの効果が低い際の監視支援ツールは？", a: "A. フィードバック", b: "B. Prompt Builder スコアカード", correct: "B", exp: "Bが正解：ユーザー評価を追跡し性能を可視化する専用機能です。" },
+            { id: 15, cat: "プロンプト設定", q: "カスタムプロンプトで「関連リスト」を使用する際の考慮事項は？", a: "A. 形式選択", b: "B. 差し込み項目の最大数", correct: "B", exp: "Bが正解：トークン制限や性能維持のため取得数に制約があります。" },
+            { id: 16, cat: "Data Cloud", q: "識別項目とコンテンツ項目の違いは？", a: "A. 識別は検索・特定用、コンテンツは回答生成用", b: "B. 逆", correct: "A", exp: "Aが正解：AIは識別項目で情報を探し、中身から答えを構成します。" },
+            { id: 17, cat: "営業AI", q: "複数オブジェクトから「スナップショット」を作る機能は？", a: "A. 営業サマリー", b: "B. 営業インサイトサマリー", correct: "B", exp: "Bが正解：標準アクションの正確な名称です。" },
+            { id: 18, cat: "プロンプト設定", q: "特定のレコードページにボタン配置等を行うビルダーは？", a: "A. モデルビルダー", b: "B. プロンプトビルダー", correct: "B", exp: "Bが正解：ページ上でのAI実行を管理する設定場所です。" },
+            { id: 19, cat: "Agentforce", q: "Agentforce実装の最も主要なビジネス理由は？", a: "A. クレンジング", b: "B. 反復タスクの自動化効率向上", correct: "B", exp: "Bが正解：業務効率の抜本的向上が主目的です。" },
+            { id: 20, cat: "Trust Layer", q: "毒性スコア「1」は何を示していますか？", a: "A. 安全", b: "B. 極めて高い（危険）", correct: "B", exp: "Bが正解：数値が低いほど深刻な毒性を示します。" },
+            { id: 21, cat: "セキュリティ", q: "データマスキング検証のために最初に行うべき手順は？", a: "A. 監査データ収集の有効化", b: "B. デバッグ", correct: "A", exp: "Aが正解：まず記録を有効にしないとマスキング結果の監査ができません。" },
+            { id: 22, cat: "統合", q: "外部API応答を差し込み項目として使うには？", a: "A. 外部サービスレコードの差し込み項目を使用", b: "B. XML変換", correct: "A", exp: "Aが正解：外部サービス経由のデータはマッピングされた項目として利用可能です。" },
+            { id: 23, cat: "アクション", q: "トピックは選ばれるがアクションが選ばれない際の対策は？", a: "A. アクションスコープ", b: "B. アクション指示（Instruction）の修正", correct: "B", exp: "Bが正解：指示がAIにとってのアクション起動マニュアルです。" },
+            { id: 24, cat: "統合", q: "外部サイトから直接通信するためのフレームワークは？", a: "A. A2A", b: "B. エージェントAPI", correct: "B", exp: "Bが正解：公式の外部連携窓口機能です。" },
+            { id: 25, cat: "グラウンディング", q: "レコードスナップショット利用のために必要な準備は？", a: "A. ページレイアウト設定", b: "B. 項目セット", correct: "A", exp: "Aが正解：配置されている項目をAIが参照するためレイアウト設定が必須です。" },
+            { id: 26, cat: "グラウンディング", q: "レコードスナップショットの除外事項は？", a: "A. 活動（ToDo/行動）", b: "B. 空データ", correct: "A", exp: "Aが正解：活動関連は意図的に除外対象となっています。" },
+            { id: 27, cat: "検索戦略", q: "精度とあいまいさ解消のバランスが取れた戦略は？", a: "A. ハイブリッド検索", b: "B. キーワードのみ", correct: "A", exp: "Aが正解：単語一致と文脈理解の組み合わせが最適です。" },
+            { id: 28, cat: "監視", q: "イベントログ強化で可能になることは？", a: "A. セッションデータの表示", b: "B. クリックパス", correct: "A", exp: "Aが正解：生の対話ログを詳細に追跡できるようになります。" },
+            { id: 29, cat: "権限", q: "テンプレートの「実行」のみができる権限セットは？", a: "A. Prompt Template User", b: "B. Manager", correct: "A", exp: "Aが正解：管理を除外した実行専用の権限です。" },
+            { id: 30, cat: "動作", q: "リクエストを理解できない場合、どう応答しますか？", a: "A. エラー出力", b: "B. 言い換えを求める標準メッセージ", correct: "B", exp: "Bが正解：再試行を促す会話的メッセージを返します。" },
+            { id: 31, cat: "推論制御", q: "アクションの順序を確実に制御するテクニックは？", a: "A. 順序を指定", b: "B. モデル変更", correct: "A", exp: "Aが正解：明示的なシーケンス指定が最も確実です。" },
+            { id: 32, cat: "分析", q: "クエリパターンを特定できるダッシュボードは？", a: "A. ユーザー発話ダッシュボード", b: "B. イベントログ", correct: "A", exp: "Aが正解：生の入力テキストを分析する専用機能です。" },
+            { id: 33, cat: "制限", q: "取引先で活動リストを使えない理由は？", a: "A. ポリモーフィック項目だから", b: "B. 個人取引先", correct: "A", exp: "Aが正解：仕様上の制限（参照先が複数のため）です。" },
+            { id: 34, cat: "実行制御", q: "順序を確実に強制する実装アプローチは？", a: "A. 変数によるフィルター実装", b: "B. 指示のみ", correct: "A", exp: "Aが正解：状態を変数に持ち次工程の起動条件とします。" },
+            { id: 35, cat: "アクション設定", q: "期待通り実行させるために最も確実な設定は？", a: "A. アクション名", b: "B. アクション指示（Instruction）", correct: "B", exp: "Bが正解：AIの判断を導くマニュアルとなる項目だからです。" },
+            { id: 36, cat: "権限", q: "モデル管理とテンプレート作成の両方に必要なのは？", a: "A. Data Cloud管理者とManager", b: "B. Userのみ", correct: "A", exp: "Aが正解：基盤管理とツール作成、両方のプロファイル権限が必要です。" },
+            { id: 37, cat: "検索", q: "リトリーバーでフィルターを適用する目的は？", a: "A. 関連性の向上", b: "B. マスキング", correct: "A", exp: "Aが正解：不要な情報を削ぎ落として精度を高めます。" },
+            { id: 38, cat: "実装サポート", q: "ガイドについて質問できるようにするには？", a: "A. ナレッジ記事として公開", b: "B. テンプレート作成", correct: "A", exp: "Aが正解：Agentforceはナレッジを信頼できる回答ソースとして参照します。" },
+            { id: 39, cat: "プロンプト手法", q: "応答を「共感的」にするための重要要素は？", a: "A. キャラクターを演じるよう指示", b: "B. キーワードのみ", correct: "A", exp: "Aが正解：ペルソナを与える指示がトーン維持に最も有効です。" },
+            { id: 40, cat: "タイプ", q: "社内業務（ToDo等）を支援するエージェントは？", a: "A. 従業員エージェント", b: "B. サービスエージェント", correct: "A", exp: "Aが正解：社内スタッフ向けの特化型エージェント名称です。" },
+            { id: 41, cat: "設定", q: "プレビューがグレーアウトしている原因は？", a: "A. レコード未選択", b: "B. 保存未完了", correct: "A", exp: "Aが正解：コンテキストとなるデータ指定が必須だからです。" },
+            { id: 42, cat: "有効化", q: "営業チームがテンプレートを使えるようにするステップは？", a: "A. User権限と機能の有効化", b: "B. 管理権限のみ", correct: "A", exp: "Aが正解：権限と組織設定、両方の手動有効化が必要です。" },
+            { id: 43, cat: "Data Cloud", q: "リトリーバーの有効なユースケースは？", a: "A. ベクトルDBから返して拡張", b: "B. 外部サイト更新", correct: "A", exp: "Aが正解：RAGによるグラウンディングの基盤機能です。" },
+            { id: 44, cat: "自動生成", q: "インデックス作成時に自動生成されるものは？", a: "A. 同名のリトリーバー", b: "B. Apexクラス", correct: "A", exp: "Aが正解：AIが参照できるよう自動で口が用意されます。" },
+            { id: 45, cat: "セキュリティ", q: "データマスキングルールの変更場所は？", a: "A. Trust Layerの設定", b: "B. LLM側の設定", correct: "A", exp: "Aが正解：Salesforce内部のセキュリティゲートで一元管理します。" },
+            { id: 46, cat: "分析", q: "エージェントの使いやすさを分析する機能は？", a: "A. Agentforceアナリティクス", b: "B. エージェントスタジオ", correct: "A", exp: "Aが正解：採用率や利用状況を可視化する標準ダッシュボードです。" },
+            { id: 47, cat: "SDR", q: "リード評価や会議予約を自動化する機能は？", a: "A. SDRエージェント", b: "B. セールスコーチ", correct: "A", exp: "Aが正解：営業初期工程の自動化用エージェントです。" },
+            { id: 48, cat: "検索改善", q: "古い記事を返さないようにする最も簡単な対処は？", a: "A. リトリーバー設定でフィルター追加", b: "B. 物理削除", correct: "A", exp: "Aが正解：削除せずとも表示条件（フィルター）で制御するのが標準的です。" },
+            { id: 49, cat: "テスト", q: "隔離された環境でのテストに適しているのは？", a: "A. サンドボックス", b: "B. 本番", correct: "A", exp: "Aが正解：安全に徹底したテストが可能な唯一の環境です。" },
+            { id: 50, cat: "制限", q: "プロンプトビルダーの操作について正しい制限は？", a: "A. 設定変更履歴に記録されない", b: "B. Flexのみ可能", correct: "A", exp: "Aが正解：現時点の仕様上の留意事項です。" },
+            { id: 51, cat: "デプロイ", q: "デプロイしたフローがエラーになる最も多い原因は？", a: "A. 手動での有効化忘れ", b: "B. Apex不足", correct: "A", exp: "Aが正解：デプロイ後はデフォルトで無効になっています。" },
+            { id: 52, cat: "権限", q: "ナレッジで回答しない原因として考えられる不足権限は？", a: "A. Data Cloudユーザー権限", b: "B. ナレッジ管理", correct: "A", exp: "Aが正解：エージェントの検索機能はDC基盤を利用するためです。" },
+            { id: 53, cat: "LLM役割", q: "アクション実行におけるLLMの役割は？", a: "A. 最適なトピックとアクション、順序を特定", b: "B. セキュリティ決定", correct: "A", exp: "Aが正解：意図を解釈して実行プランを立てるのが核心です。" },
+            { id: 54, cat: "アクセス制限", q: "記事へのアクセスを制限する正しい方法は？", a: "A. データカテゴリフィルター", b: "B. 指示のみ", correct: "A", exp: "Aが正解：Salesforceの標準機能を用いた制御が最も安全です。" },
+            { id: 55, cat: "アクセス手法", q: "プロンプトビルダーからDCデータにアクセスする手段は？", a: "A. 関連リストやプロンプト起動フロー", b: "B. 外部APIのみ", correct: "A", exp: "Aが正解：内部の標準連携機能で完結可能です。" },
+            { id: 56, cat: "標準アクション", q: "成功例に基づきメール下書きを作る標準アクションは？", a: "A. 営業メールのドラフト作成", b: "B. 要約", correct: "A", exp: "Aが正解：営業担当者向けの特化型生成アクションです。" },
+            { id: 57, cat: "PDF", q: "PDFを回答根拠にするために最初に行うべきことは？", a: "A. データライブラリの設定", b: "B. スコープ拡大", correct: "A", exp: "Aが正解：非構造化データをAIに公開するための手順です。" },
+            { id: 58, cat: "類似商談", q: "「似た商談を見せて」に対する最適な対応は？", a: "A. 標準アクションを使用", b: "B. カスタムフロー", correct: "A", exp: "Aが正解：標準機能を有効化するだけで実現可能です。" },
+            { id: 59, cat: "目的", q: "プロンプトビルダーの主な目的は？", a: "A. 再利用可能な指示の作成と管理", b: "B. 開発支援のみ", correct: "A", exp: "Aが正解：作業フローにAI応答を組み込むためのハブツールです。" },
+            { id: 60, cat: "ベストプラクティス", q: "苦情解決を自動化するのに最適なエージェントは？", a: "A. サービスエージェント", b: "B. カスタムエージェント", correct: "A", exp: "Aが正解：サポート業務に特化した標準エージェントタイプです。" },
+            { id: 61, cat: "プランニング", q: "リクエストに対するプラン生成プロセスは？", a: "A. LLMが意図を解釈し動的に生成", b: "B. 静的ルール", correct: "A", exp: "Aが正解：自律型AIの推論による動的処理が本質です。" },
+            { id: 62, cat: "設定", q: "保存後のカスタムプロンプトで同じ結果を得るには？", a: "A. ハイパーパラメータの手動追加", b: "B. 戻す", correct: "A", exp: "Aが正解：ランダム性制御等の設定は別途再設定が必要です。" },
+            { id: 63, cat: "検索", q: "「条項番号」の完全一致を得るために最適なのは？", a: "A. キーワード検索", b: "B. セマンティック検索", correct: "A", exp: "Aが正解：固有IDには単語の完全一致が最も確実です。" },
+            { id: 64, cat: "プロンプト", q: "AI作成要約を項目入力し人間が確認するプロセスを設計するには？", a: "A. 項目生成", b: "B. 要約パネル", correct: "A", exp: "Aが正解：データベースへの保存と確認フロー専用のテンプレートです。" },
+            { id: 65, cat: "アクション", q: "カスタムアクションのコアコンポーネントはどれですか？", a: "A. インストラクション（指示）", b: "B. 出力タイプのみ", correct: "A", exp: "Aが正解：AIに対するマニュアルこそが核となる設定です。" },
+            { id: 66, cat: "設定", q: "カスタムアクションとして選択可能なロジックは？", a: "A. フロー", b: "B. SOQLのみ", correct: "A", exp: "Aが正解：ノーコードでロジックを呼出可能なフローが主要選択肢です。" },
+            { id: 67, cat: "エラー", q: "トークン制限エラーがランダムに発生する原因は？", a: "A. レコードによりデータ長が異なるため", b: "B. 変動制のみ", correct: "A", exp: "Aが正解：挿入される項目の文字数によって総トークンが変動するためです。" },
+            { id: 68, cat: "SDR", q: "SDRエージェント実装におけるチャネルの考慮事項は？", a: "A. メッセージングチャネルへのデプロイ", b: "B. Eメールのみ", correct: "A", exp: "Aが正解：リアルタイム対話にはデジタルエンゲージメントチャネルが必要です。" },
+            { id: 69, cat: "開発", q: "LWCから呼び出し可能なプロンプトテンプレートは？", a: "A. Flex", b: "B. 項目生成のみ", correct: "A", exp: "A" , exp: "Aが正解：オブジェクト非依存で汎用性が最も高いタイプです。" },
+            { id: 70, cat: "理由", q: "ナレッジ使用の主な利点は何ですか？", a: "A. 承認済みの信頼できる情報源", b: "B. 高速なだけ", correct: "A", exp: "Aが正解：嘘を防ぎ、公式な回答を保証するための手段です。" },
+            { id: 71, cat: "推論調整", q: "順序が正しくない場合、指示をどう調整すべき？", a: "A. API参照名で依存関係を指定", b: "B. モデル変更", correct: "A", exp: "Aが正解：AIにアクション間の論理的繋がりを具体的に教え込みます。" },
+            { id: 72, cat: "設定", q: "アクションを割り当てる正しい手順は？", a: "A. エージェントビルダーでトピックに紐付ける", b: "B. プロファイル設定", correct: "A", exp: "Aが正解：コパイロットの設定画面（ビルダー）で行います。" },
+            { id: 73, cat: "デプロイ", q: "開発環境から本番へ移行する標準的な手段は？", a: "A. 送信変更セット", b: "B. 手動再作成", correct: "A", exp: "Aが正解：Agentforceの設定はメタデータとして移行可能です。" },
+            { id: 74, cat: "効率化", q: "入力時間と後処理を同時に削減する組み合わせは？", a: "A. 返信おすすめとケース分類", b: "B. 要約パネルのみ", correct: "A", exp: "Aが正解：定型回答と項目提案のセットが効率化に寄与します。" },
+            { id: 75, cat: "設定", q: "類似ケースに基づき回答させたい。DCでの必須作業は？", a: "A. UDMO作成とインデックス化", b: "B. DMOのみ", correct: "A", exp: "Aが正解：非構造化データの意味検索にはUDMOの定義が必要です。" },
+            { id: 76, cat: "外部モデル", q: "外部モデルの推奨を取り込む手順は？", a: "A. エンドポイント作成しモデルビルダーで設定", b: "B. Pythonコードのみ", correct: "A", exp: "Aが正解：BYOM（モデル持ち込み）の標準的な接続フローです。" },
+            { id: 77, cat: "プランナー", q: "プランナーサービスの主な機能はどれですか？", a: "A. アクションを特定しプランを作成", b: "B. 翻訳のみ", correct: "A", exp: "Aが正解：発話から意図を導き出す指令塔の役割です。" },
+            { id: 78, cat: "管理", q: "割り当てられたアクションを更新する場所は？", a: "A. コパイロットアクションページ", b: "B. ダッシュボード", correct: "A", exp: "Aが正解：設定メニュー内のアクション管理画面で行います。" },
+            { id: 79, cat: "自動生成", q: "データライブラリ保存後にDCで作成されるのは？", a: "A. ストリーム、インデックス、レトリーバー", b: "B. 分析のみ", correct: "A", exp: "Aが正解：AIが参照するためのバックエンドインフラです。" },
+            { id: 80, cat: "統合", q: "外部AIモデルと対話しやすくするプロトコルは？", a: "A. MCP（モデルコンテキストプロトコル）", b: "B. A2A", correct: "A", exp: "Aが正解：業界標準の安全なデータ通信規格です。" },
+            { id: 81, cat: "表示", q: "作成したプロンプトをユーザーに公開するには？", a: "A. ページ上の項目にテンプレートを関連付け", b: "B. 権限付与のみ", correct: "A", exp: "Aが正解：UIパーツとロジックをバインドして公開します。" },
+            { id: 82, cat: "利点", q: "パーソナライズメールのためにエージェントを使う理由は？", a: "A. 関連性の高いコンテンツを瞬時に生成できるため", b: "B. キャンペーンのみ", correct: "A", exp: "Aが正解：リアルタイムデータ活用がAI最大の強みです。" },
+            { id: 83, cat: "グラウンディング", q: "グラウンディングで使用できない項目タイプは？", a: "A. リッチテキスト", b: "B. テキストエリア", correct: "A", exp: "Aが正解：現時点の機能制限として把握しておくべき事項です。" },
+            { id: 84, cat: "プロンプト手法", q: "余計な会話を含めないようにする最も確実な手法は？", a: "A. 望ましい出力例を提供する（Few-shot）", b: "B. 言葉で頼む", correct: "A", exp: "Aが正解：例示がAIの出力を最も厳密に制御できます。" },
+            { id: 85, cat: "アクション", q: "ナレッジに基づいて答える標準アクションの正式名称は？", a: "A. ナレッジで質問に回答する", b: "B. FAQ回答", correct: "A", exp: "Aが正解：システムにプリセットされた名称です。" },
+            { id: 86, cat: "エージェント", q: "業務効率を上げるための正しい割り当てはどれですか？", a: "A. SDR、サービス、従業員の使い分け", b: "B. 1人の万能エージェント", correct: "A", exp: "Aが正解：領域特化型を利用するのが Agentforce の基本設計です。" },
+            { id: 87, cat: "アクション", q: "アクションとして設定可能なオプションは？", a: "A. フロー", b: "B. SOQLのみ", correct: "A", exp: "Aが正解：ロジックを実行する「器」としてのフロー利用が一般的です。" },
+            { id: 88, cat: "オブジェクト", q: "サービスAIグラウンディングが標準サポートするペアは？", a: "A. ケースとナレッジ", b: "B. リードのみ", correct: "A", exp: "Aが正解：サポート業務で最も頻出する2つが標準対応です。" },
+            { id: 89, cat: "外部データ", q: "外部PDFをノーコードで使わせるための手順は？", a: "A. データライブラリにアップロード", b: "B. リンク貼り付けのみ", correct: "A", exp: "Aが正解：AIが読み取れる形式で取り込む正規の手順です。" },
+            { id: 90, cat: "Slack", q: "SlackでAgentforceを有効にする必須ステップは？", a: "A. 接続設定、インストール、権限付与", b: "B. チャネル作成のみ", correct: "A", exp: "Aが正解：プラットフォーム間の連携・認証プロセスが必要です。" },
+            { id: 91, cat: "検索ランキング", q: "最新記事を優先させるための設定項目は？", a: "A. 最新性ランキング要素の追加", b: "B. インデックス削除", correct: "A", exp: "Aが正解：重み付けを変更することで鮮度を保ちます。" },
+            { id: 92, cat: "デプロイ", q: "複数のトピックを持つエージェントの本番デプロイで重要なのは？", a: "A. 依存関係の包含と事後有効化計画", b: "B. 単体デプロイ", correct: "A", exp: "Aが正解：バラバラではなくセットで移行しないと動作しません。" },
+            { id: 93, cat: "監査", q: "マスクされたデータを監査するために使用する機能は？", a: "A. 監査証跡を利用", b: "B. ログのエクスポートのみ", correct: "A", exp: "Aが正解：Trust Layerが提供する標準的なガバナンス機能です。" },
+            { id: 94, cat: "制限", q: "データソースの変更について正しいのはどれですか？", a: "A. 一度保存すると変更不可（新規作成が必要）", b: "B. いつでも可能", correct: "A", exp: "Aが正解：仕様上、保存後にソースのみを入れ替えることはできません。" },
+            { id: 95, cat: "デバッグ", q: "順序が正しくない際にまず調査すべきポイントは？", a: "A. 指示の固有性（ユニークさ）", b: "B. アイコン", correct: "A", exp: "Aが正解：似た指示はAIの選択ミス（混同）を引き起こします。" },
+            { id: 96, cat: "営業 AI", q: "営業エージェント活用の核心的なユースケースは？", a: "A. 自然言語による根拠あるアクション呼び出し", b: "B. 定型ガイド表示", correct: "A", exp: "Aが正解：自律的な判断とアクション実行こそが価値です。" },
+            { id: 97, cat: "検索", q: "ハイブリッド検索が好まれる最大の理由は？", a: "A. キーワード一致とセマンティックリコールの両立", b: "B. 速度のみ", correct: "A", exp: "Aが正解：正確さと柔軟性を同時に手に入れられるからです。" },
+            { id: 98, cat: "要約", q: "レコード詳細から包括的説明を作るのに最適なのは？", a: "A. レコードの要約", b: "B. 項目生成", correct: "A", exp: "Aが正解：全属性を把握して要約を出すのに最も適した設計です。" },
+            { id: 100, cat: "RAG / PII", q: "PII漏洩を防ぐためのインデックス作成時のベストプラクティスは？", a: "A. インデックス作成前にマスクする", b: "B. プロンプト指示のみ", correct: "A", exp: "Aが正解：物理的にデータに入れないことが最も確実な防衛策です。" }
+        ];
 
-        // --- APP LOGIC ---
         const quizApp = {
-            examKey: 'agentforce',
-            data: [],
-            currentIndex: 0,
-            score: 0,
-            answered: false,
-            isRandom: false,
-
-            selectExam(key) {
-                this.examKey = key;
-                const exam = EXAM_DATABASE[key];
-                document.getElementById('selected-exam-title').innerText = exam.title;
-                
-                // Change UI color theme
-                const color = exam.color === 'blue' ? '#2563eb' : '#06b6d4';
-                document.querySelectorAll('.bg-blue-600').forEach(el => el.style.backgroundColor = color);
-                document.getElementById('score-text').style.color = color;
-                document.getElementById('progress-bar').style.backgroundColor = color;
-
-                document.getElementById('selection-screen').classList.add('hidden');
-                document.getElementById('mode-screen').classList.remove('hidden');
-            },
-
-            backToSelection() {
-                document.getElementById('mode-screen').classList.add('hidden');
-                document.getElementById('selection-screen').classList.remove('hidden');
-            },
-
-            start(random) {
-                const rawData = EXAM_DATABASE[this.examKey].questions;
-                this.isRandom = random;
-                this.data = random ? [...rawData].sort(() => Math.random() - 0.5) : rawData;
-                
-                this.currentIndex = 0;
-                this.score = 0;
-                this.showScreen('quiz-screen');
-                this.loadQuestion();
-            },
-
-            showScreen(id) {
-                ['selection-screen', 'mode-screen', 'quiz-screen', 'result-screen'].forEach(s => {
-                    document.getElementById(s).classList.add('hidden');
+            currentPool: [], currentIndex: 0, score: 0, failedList: [],
+            sessionStats: { total: 0, correct: 0 }, catStats: {}, isReviewMode: false,
+            init() { this.renderCategoryList(); this.updateUI(); },
+            renderCategoryList() {
+                const cats = {}; RAW_DATA.forEach(q => cats[q.cat] = (cats[q.cat] || 0) + 1);
+                const container = document.getElementById('category-list-container');
+                container.innerHTML = '';
+                Object.keys(cats).sort().forEach(cat => {
+                    const div = document.createElement('div');
+                    div.className = "bg-white border-2 border-slate-100 p-5 rounded-3xl flex justify-between items-center cursor-pointer transition hover:border-blue-400 group shadow-sm active:scale-95";
+                    div.innerHTML = `<div class='flex flex-col'><span class='text-[10px] font-black text-slate-400 uppercase'>${cats[cat]} Questions</span><span class='text-sm font-bold text-slate-700'>${cat}</span></div><div class='w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all'><i class='fas fa-play text-[10px]'></i></div>`;
+                    div.onclick = () => this.startByCategory(cat);
+                    container.appendChild(div);
                 });
-                document.getElementById(id).classList.remove('hidden');
-                window.scrollTo(0,0);
             },
-
+            start(random) { this.isReviewMode = false; this.currentPool = random ? [...RAW_DATA].sort(()=>Math.random()-0.5) : [...RAW_DATA]; this.launch("Standard Marathon"); },
+            startByCategory(cat) { this.isReviewMode = false; this.currentPool = RAW_DATA.filter(q => q.cat === cat); this.launch(`Drill: ${cat}`); },
+            startReview() { if(!this.failedList.length) return; this.isReviewMode = true; this.currentPool = [...this.failedList].sort(()=>Math.random()-0.5); this.launch("Review Mode"); },
+            launch(mode) { this.currentIndex = 0; this.score = 0; document.getElementById('quiz-mode-label').innerText = mode; this.showScreen('quiz-screen'); this.loadQuestion(); },
+            showQuitModal() { document.getElementById('quit-modal').classList.remove('hidden'); },
+            hideQuitModal() { document.getElementById('quit-modal').classList.add('hidden'); },
+            quitQuiz() { this.hideQuitModal(); this.showScreen('selection-screen'); this.updateUI(); },
             loadQuestion() {
-                const q = this.data[this.currentIndex];
-                this.answered = false;
-                
-                const progress = ((this.currentIndex + 1) / this.data.length) * 100;
-                document.getElementById('progress-bar').style.width = `${progress}%`;
-                document.getElementById('progress-text').innerText = `Q ${this.currentIndex + 1}/${this.data.length}`;
-                document.getElementById('score-text').innerText = `正解率: ${Math.round((this.score / (this.currentIndex || 1)) * 100)}%`;
-                
+                const q = this.currentPool[this.currentIndex]; this.answered = false;
+                document.getElementById('progress-bar').style.width = `${((this.currentIndex+1)/this.currentPool.length)*100}%`;
+                document.getElementById('progress-text').innerText = `Q ${this.currentIndex+1}/${this.currentPool.length}`;
+                document.getElementById('score-text').innerText = `${Math.round((this.score/(this.currentIndex||1))*100)}%`;
                 document.getElementById('category-badge').innerText = q.cat;
                 document.getElementById('question-text').innerText = q.q;
-                
-                const container = document.getElementById('options-container');
-                container.innerHTML = '';
-                
-                const opts = ['A', 'B', 'C', 'D'].filter(key => q[key.toLowerCase()]);
-                opts.forEach(optKey => {
-                    const btn = document.createElement('button');
-                    btn.className = "option-btn w-full text-left p-5 rounded-2xl border-2 border-slate-100 hover:border-blue-400 hover:bg-blue-50 transition flex items-start group shadow-sm bg-white";
-                    btn.innerHTML = `
-                        <span class="inline-block w-8 h-8 rounded-lg bg-slate-100 text-slate-500 font-black text-center leading-8 mr-4 group-hover:bg-blue-500 group-hover:text-white transition flex-shrink-0">${optKey}</span>
-                        <span class="text-slate-700 font-bold">${q[optKey.toLowerCase()]}</span>
-                    `;
-                    btn.onclick = () => this.handleAnswer(optKey, btn);
-                    container.appendChild(btn);
-                });
-
-                document.getElementById('explanation-container').classList.add('hidden');
-            },
-
-            handleAnswer(choice, btn) {
-                if(this.answered) return;
-                this.answered = true;
-                
-                const q = this.data[this.currentIndex];
-                // Handle multiple answers if comma separated (B, D etc)
-                const correctArr = q.correct.split(',').map(s => s.trim());
-                const isCorrect = correctArr.includes(choice);
-                
-                if(isCorrect) this.score++;
-
-                document.querySelectorAll('.option-btn').forEach(b => {
-                    b.disabled = true;
-                    const bKey = b.querySelector('span:first-child').innerText;
-                    if(correctArr.includes(bKey)) {
-                        b.classList.add('border-green-500', 'bg-green-50');
-                        b.querySelector('span:first-child').classList.add('bg-green-500', 'text-white');
+                const container = document.getElementById('options-container'); container.innerHTML = '';
+                ['A','B','C','D'].forEach(key => {
+                    if(q[key.toLowerCase()]) {
+                        const btn = document.createElement('button');
+                        btn.className = "option-btn w-full text-left p-6 rounded-2xl border-2 border-slate-100 hover:border-blue-400 hover:bg-blue-50 transition flex items-start group bg-white shadow-sm";
+                        btn.innerHTML = `<span class='inline-block w-10 h-10 rounded-xl bg-slate-100 text-slate-400 font-black text-center leading-10 mr-6 group-hover:bg-blue-600 group-hover:text-white transition flex-shrink-0'>${key}</span><span class='text-slate-700 font-bold text-lg pt-1 leading-tight'>${q[key.toLowerCase()]}</span>`;
+                        btn.onclick = () => this.handleAnswer(key, btn);
+                        container.appendChild(btn);
                     }
                 });
-
-                if(!isCorrect) {
-                    btn.classList.add('border-red-500', 'bg-red-50');
-                    btn.querySelector('span:first-child').classList.add('bg-red-500', 'text-white');
-                }
-
-                const badge = document.getElementById('result-badge');
-                badge.className = `flex items-center mb-6 font-black text-xl italic ${isCorrect ? 'text-green-600' : 'text-red-600'}`;
-                badge.innerHTML = isCorrect 
-                    ? `<i class="fas fa-check-circle mr-3 text-3xl"></i> 正解！` 
-                    : `<i class="fas fa-times-circle mr-3 text-3xl"></i> 不正解 (正解: ${q.correct})`;
-                
+                document.getElementById('explanation-container').classList.add('hidden');
+            },
+            handleAnswer(choice, btn) {
+                if(this.answered) return; this.answered = true;
+                const q = this.currentPool[this.currentIndex]; const correct = q.correct.split(',').map(s=>s.trim()); const isCorrect = correct.includes(choice);
+                this.sessionStats.total++; if(!this.catStats[q.cat]) this.catStats[q.cat] = {correct:0, total:0}; this.catStats[q.cat].total++;
+                if(isCorrect) { this.score++; this.sessionStats.correct++; this.catStats[q.cat].correct++; if(this.isReviewMode) this.failedList = this.failedList.filter(item=>item.id!==q.id); }
+                else if(!this.failedList.find(i=>i.id===q.id)) { this.failedList.push(q); }
+                document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if(correct.includes(b.querySelector('span').innerText)) b.classList.add('border-green-500','bg-green-50'); });
+                if(!isCorrect) btn.classList.add('border-red-500','bg-red-50');
+                document.getElementById('result-badge').className = `flex items-center p-6 rounded-2xl mb-6 font-black text-lg ${isCorrect?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}`;
+                document.getElementById('result-badge').innerHTML = isCorrect ? "<i class='fas fa-check-circle mr-3'></i> 正解です！" : `<i class='fas fa-times-circle mr-3'></i> 不正解です (正解: ${q.correct})`;
                 document.getElementById('explanation-text').innerText = q.exp;
                 document.getElementById('explanation-container').classList.remove('hidden');
-                
-                setTimeout(() => {
-                    document.getElementById('explanation-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 150);
+                setTimeout(() => { document.getElementById('explanation-container').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+                this.updateUI();
             },
-
-            nextQuestion() {
-                this.currentIndex++;
-                if(this.currentIndex < this.data.length) {
-                    this.loadQuestion();
-                } else {
-                    this.showResult();
-                }
-            },
-
+            nextQuestion() { this.currentIndex++; if(this.currentIndex < this.currentPool.length) this.loadQuestion(); else this.showResult(); },
             showResult() {
-                this.showScreen('result-screen');
-                const percent = Math.round((this.score / this.data.length) * 100);
+                this.showScreen('result-screen'); const percent = Math.round((this.score/this.currentPool.length)*100);
                 document.getElementById('final-score').innerText = `${percent}%`;
-                document.getElementById('final-stats').innerText = `${this.data.length}問中 ${this.score}問正解`;
+                document.getElementById('final-stats').innerText = `${this.currentPool.length}問中 ${this.score}問正解`;
+                const table = document.getElementById('analysis-table-body'); table.innerHTML = '';
+                Object.keys(this.catStats).forEach(cat => {
+                    const s = this.catStats[cat]; const catPerc = Math.round((s.correct/s.total)*100);
+                    let judge = catPerc>=80?"強み":(catPerc>=50?"普通":"弱点"); let cls = catPerc>=80?"text-green-600 bg-green-50":(catPerc>=50?"text-yellow-600 bg-yellow-50":"text-red-500 bg-red-50");
+                    table.innerHTML += `<tr class='group hover:bg-slate-50 transition'><td class='p-4 font-bold'>${cat}</td><td class='p-4 text-right'><span class='px-4 py-1.5 rounded-full text-[10px] font-black uppercase ${cls}'>${judge} (${catPerc}%)</span></td></tr>`;
+                });
+                document.getElementById('final-emoji').innerText = percent>=80?"🏆":(percent>=60?"📚":"⏳");
+            },
+            updateUI() {
+                const wrong = this.failedList.length; const total = this.sessionStats.total;
+                const acc = total>0?Math.round((this.sessionStats.correct/total)*100):0;
+                document.getElementById('header-wrong-count').innerText = wrong;
+                document.getElementById('dash-total-attempts').innerText = total;
+                document.getElementById('dash-overall-accuracy').innerText = `${acc}%`;
+                document.getElementById('overall-progress-text').innerText = `${acc}%`;
+                document.getElementById('failed-count-display').innerText = wrong;
+                document.getElementById('overall-progress-bar').style.width = `${acc}%`;
+                document.getElementById('review-section').classList.toggle('hidden', wrong === 0);
                 
-                let emoji = percent >= 80 ? "🏆" : (percent >= 60 ? "📚" : "⏳");
-                document.getElementById('final-emoji').innerText = emoji;
-            }
+                const weak = document.getElementById('weak-categories-list');
+                const sorted = Object.keys(this.catStats).map(c=>({c, a:Math.round((this.catStats[c].correct/this.catStats[c].total)*100)}))
+                    .filter(i=>i.a < 80).sort((a,b)=>a.a-b.a).slice(0,3);
+                if(sorted.length) weak.innerHTML = sorted.map(i=>`<div class='flex justify-between bg-slate-950/40 p-3 rounded-2xl border border-slate-700'><span class='text-xs font-bold text-slate-300'>${i.c}</span><span class='text-xs font-black text-red-400'>${i.a}%</span></div>`).join('');
+            },
+            showScreen(id) { ['selection-screen', 'quiz-screen', 'result-screen'].forEach(s => document.getElementById(s).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); window.scrollTo(0,0); }
         };
-
-        // Initialize nothing special, selection screen is default.
+        window.onload = () => quizApp.init();
     </script>
 </body>
 </html>
