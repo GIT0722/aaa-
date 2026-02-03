@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salesforce Admin 200問ノック</title>
+    <title>Salesforce Admin 2026 実践ノック</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .option-btn.selected { border-color: #4f46e5; background-color: #eef2ff; }
@@ -17,8 +17,8 @@
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
             <div class="flex justify-between items-start">
                 <div>
-                    <h1 class="text-xl font-black text-indigo-600">SF Admin Quiz</h1>
-                    <div id="weak-categories" class="text-[10px] font-bold text-rose-500 mt-1 max-w-xs">弱点: 分析中...</div>
+                    <h1 class="text-xl font-black text-indigo-600 italic">SF Admin 2026 Knock</h1>
+                    <div id="weak-categories" class="text-[10px] font-bold text-rose-500 mt-1 max-w-xs uppercase tracking-wider">弱点: 分析中...</div>
                 </div>
                 <div id="stats-display" class="text-right text-xs font-bold text-slate-500 space-y-1">
                     <div>正答率: <span id="accuracy-rate" class="text-indigo-600 text-sm">0%</span></div>
@@ -27,35 +27,38 @@
             </div>
             
             <div class="flex flex-wrap gap-2">
-                <select id="category-filter" class="border p-2 rounded-lg bg-white text-xs"></select>
+                <select id="category-filter" class="border p-2 rounded-lg bg-white text-xs focus:ring-2 focus:ring-indigo-200 outline-none"></select>
                 <button id="review-mode-btn" class="border px-3 py-2 rounded-lg text-xs bg-white hover:bg-rose-50 text-rose-600 font-bold transition-colors">❌ 復習モード: OFF</button>
-                <button id="random-btn" class="border px-3 py-2 rounded-lg text-xs bg-white hover:bg-slate-50">🔄 番号順</button>
-                <input type="text" id="search-input" placeholder="検索..." class="border p-2 rounded-lg flex-1 text-xs">
-                <button id="reset-stats" class="text-[10px] text-slate-400 hover:text-rose-500 underline">統計リセット</button>
+                <button id="random-btn" class="border px-3 py-2 rounded-lg text-xs bg-white hover:bg-slate-50 font-bold">🔄 番号順</button>
+                <input type="text" id="search-input" placeholder="キーワード検索..." class="border p-2 rounded-lg flex-1 text-xs focus:ring-2 focus:ring-indigo-200 outline-none">
+                <button id="reset-stats" class="text-[10px] text-slate-400 hover:text-rose-500 underline transition-colors">統計リセット</button>
             </div>
         </div>
 
-        <div class="bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-slate-200">
+        <div class="bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-slate-200 relative overflow-hidden">
             <div class="flex justify-between items-center mb-2">
-                <span id="progress-badge" class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full"></span>
+                <span id="progress-badge" class="bg-indigo-100 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-full uppercase"></span>
             </div>
-            <div class="w-full bg-slate-100 h-2 rounded-full mb-8 overflow-hidden">
-                <div id="progress-fill" class="bg-indigo-500 h-full transition-all" style="width: 0%"></div>
+            <div class="w-full bg-slate-100 h-1.5 rounded-full mb-8 overflow-hidden">
+                <div id="progress-fill" class="bg-indigo-500 h-full transition-all duration-500" style="width: 0%"></div>
             </div>
             
-            <h2 id="question-text" class="text-lg md:text-xl font-bold leading-relaxed mb-8"></h2>
+            <h2 id="question-text" class="text-lg md:text-xl font-bold leading-relaxed mb-8 min-h-[3em]"></h2>
             <div id="options-container" class="grid gap-3 mb-8"></div>
 
-            <button id="submit-btn" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition-all disabled:opacity-30 disabled:cursor-not-allowed">回答を確定する</button>
+            <button id="submit-btn" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition-all disabled:opacity-30 disabled:cursor-not-allowed transform active:scale-[0.98]">回答を確定する</button>
 
-            <div id="explanation-box" class="hidden mt-6 p-6 rounded-2xl border-2 border-emerald-100 bg-emerald-50 shadow-inner">
-                <p class="font-black text-emerald-800 mb-2">💡 解説</p>
+            <div id="explanation-box" class="hidden mt-6 p-6 rounded-2xl border-2 border-emerald-100 bg-emerald-50 shadow-inner animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xl">💡</span>
+                    <p class="font-black text-emerald-800">2026 Admin Point</p>
+                </div>
                 <p id="explanation-text" class="text-emerald-700 leading-relaxed text-sm"></p>
             </div>
 
             <div class="flex justify-between items-center mt-10 pt-6 border-t border-slate-100">
-                <button id="prev-btn" class="text-slate-400 font-bold hover:text-indigo-600 transition-colors px-4 py-2">← 前へ</button>
-                <button id="next-btn" class="bg-slate-800 text-white px-8 py-2 rounded-xl font-bold hover:bg-slate-700 transition-all">次へ</button>
+                <button id="prev-btn" class="text-slate-400 font-bold hover:text-indigo-600 transition-colors px-4 py-2 disabled:opacity-0">← PREV</button>
+                <button id="next-btn" class="bg-slate-800 text-white px-10 py-2 rounded-xl font-bold hover:bg-slate-700 transition-all transform active:scale-95 shadow-md">NEXT</button>
             </div>
         </div>
     </div>
