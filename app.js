@@ -1,11 +1,16 @@
+// --- 状態管理 (localStorage) ---
+let progress = JSON.parse(localStorage.getItem('sf_admin_quiz_v1')) || {
+    wrongIds: [],
+    correctCount: 0,
+    totalAttempted: 0,
+    catStats: {} // カテゴリ別の {correct: n, attempt: m}
+};
+
 let currentIdx = 0;
 let selectedLabels = [];
 let isRandomMode = false;
+let isReviewMode = false;
 let filteredQuestions = [...FULL_QUESTIONS];
-
-// 統計用変数
-let totalAnswered = 0;
-let correctCount = 0;
 
 const el = {
     qText: document.getElementById('question-text'),
@@ -20,23 +25,50 @@ const el = {
     search: document.getElementById('search-input'),
     progress: document.getElementById('progress-badge'),
     progressFill: document.getElementById('progress-fill'),
-    accuracy: document.getElementById('accuracy-rate')
+    accuracy: document.getElementById('accuracy-rate'),
+    statDetails: document.getElementById('stat-details'),
+    weakCats: document.getElementById('weak-categories'),
+    reviewBtn: document.getElementById('review-mode-btn'),
+    resetBtn: document.getElementById('reset-stats')
 };
 
-// カテゴリ初期化
+// --- 初期化 ---
 const categories = [...new Set(FULL_QUESTIONS.map(q => q.category))];
-const firstOpt = document.createElement('option');
-firstOpt.value = 'All'; firstOpt.textContent = 'すべてのカテゴリ';
-el.category.appendChild(firstOpt);
+el.category.innerHTML = '<option value="All">すべてのカテゴリ</option>';
 categories.forEach(cat => {
     const opt = document.createElement('option');
     opt.value = cat; opt.textContent = cat;
     el.category.appendChild(opt);
 });
 
+function save() {
+    localStorage.setItem('sf_admin_quiz_v1', JSON.stringify(progress));
+    updateStatsDisplay();
+}
+
+function updateStatsDisplay() {
+    const rate = progress.totalAttempted === 0 ? 0 : Math.round((progress.correctCount / progress.totalAttempted) * 100);
+    el.accuracy.textContent = `${rate}%`;
+    el.statDetails.textContent = `正解:${progress.correctCount} / 挑戦:${progress.totalAttempted}`;
+
+    // 弱点カテゴリ特定 (正解率70%以下を表示)
+    const weak = Object.entries(progress.catStats)
+        .map(([name, s]) => ({ name, rate: (s.correct / s.attempt) * 100 }))
+        .filter(c => c.rate < 70)
+        .sort((a, b) => a.rate - b.rate)
+        .map(c => `${c.name}(${Math.round(c.rate)}%)`);
+    
+    el.weakCats.textContent = weak.length > 0 ? `弱点: ${weak.join(', ')}` : "弱点: なし (順調です！)";
+}
+
+// --- コア機能 ---
 function render() {
     const q = filteredQuestions[currentIdx];
-    if (!q) return;
+    if (!q) {
+        el.qText.textContent = "該当する問題がありません。";
+        el.options.innerHTML = "";
+        return;
+    }
 
     selectedLabels = [];
     el.explanation.classList.add('hidden');
@@ -45,11 +77,8 @@ function render() {
     el.options.innerHTML = '';
     
     el.qText.textContent = `Q${q.id}. ${q.question}`;
-    el.progress.textContent = `問題 ${currentIdx + 1} / ${filteredQuestions.length}`;
-    
-    // 進捗バー更新
-    const progressPercent = ((currentIdx + 1) / filteredQuestions.length) * 100;
-    el.progressFill.style.width = `${progressPercent}%`;
+    el.progress.textContent = `問題 ${currentIdx + 1} / ${filteredQuestions.length} ${isReviewMode ? '(復習中)' : ''}`;
+    el.progressFill.style.width = `${((currentIdx + 1) / filteredQuestions.length) * 100}%`;
 
     q.options.forEach(opt => {
         const btn = document.createElement('button');
@@ -86,12 +115,22 @@ el.submit.onclick = () => {
     const isCorrect = selectedLabels.length === q.correctAnswer.length && 
                       selectedLabels.every(l => q.correctAnswer.includes(l));
 
-    // 統計更新
-    totalAnswered++;
-    if (isCorrect) correctCount++;
-    const rate = Math.round((correctCount / totalAnswered) * 100);
-    el.accuracy.textContent = `${rate}% (正解:${correctCount} / 挑戦:${totalAnswered})`;
+    // 統計計算
+    if (!progress.catStats[q.category]) progress.catStats[q.category] = { correct: 0, attempt: 0 };
+    progress.totalAttempted++;
+    progress.catStats[q.category].attempt++;
 
+    if (isCorrect) {
+        progress.correctCount++;
+        progress.catStats[q.category].correct++;
+        progress.wrongIds = progress.wrongIds.filter(id => id !== q.id);
+    } else {
+        if (!progress.wrongIds.includes(q.id)) progress.wrongIds.push(q.id);
+    }
+
+    save();
+
+    // 表示反映
     el.expText.textContent = q.explanation;
     el.explanation.classList.remove('hidden');
     el.submit.classList.add('hidden');
@@ -103,17 +142,36 @@ el.submit.onclick = () => {
     });
 };
 
-el.next.onclick = () => { if (currentIdx < filteredQuestions.length - 1) { currentIdx++; render(); } };
-el.prev.onclick = () => { if (currentIdx > 0) { currentIdx--; render(); } };
-
+// --- フィルタリング ---
 function updateFilter() {
     const cat = el.category.value;
     const s = el.search.value.toLowerCase();
-    filteredQuestions = FULL_QUESTIONS.filter(q => (cat === 'All' || q.category === cat) && (q.question.toLowerCase().includes(s) || q.explanation.toLowerCase().includes(s)));
+    
+    filteredQuestions = FULL_QUESTIONS.filter(q => {
+        const matchCat = (cat === 'All' || q.category === cat);
+        const matchSearch = (q.question.toLowerCase().includes(s) || q.explanation.toLowerCase().includes(s));
+        const matchReview = isReviewMode ? progress.wrongIds.includes(q.id) : true;
+        return matchCat && matchSearch && matchReview;
+    });
+
     if (isRandomMode) filteredQuestions.sort(() => Math.random() - 0.5);
-    currentIdx = 0; render();
+    
+    if (filteredQuestions.length === 0 && isReviewMode) {
+        alert("復習すべき問題はありません！");
+        isReviewMode = false;
+        el.reviewBtn.classList.replace('bg-rose-600', 'bg-white');
+        el.reviewBtn.classList.replace('text-white', 'text-rose-600');
+        updateFilter();
+        return;
+    }
+
+    currentIdx = 0; 
+    render();
 }
 
+// --- イベントリスナー ---
+el.next.onclick = () => { if (currentIdx < filteredQuestions.length - 1) { currentIdx++; render(); } };
+el.prev.onclick = () => { if (currentIdx > 0) { currentIdx--; render(); } };
 el.category.onchange = updateFilter;
 el.search.oninput = updateFilter;
 el.random.onclick = () => {
@@ -121,5 +179,20 @@ el.random.onclick = () => {
     el.random.textContent = isRandomMode ? "🔄 ランダム中" : "🔄 番号順";
     updateFilter();
 };
+el.reviewBtn.onclick = () => {
+    isReviewMode = !isReviewMode;
+    el.reviewBtn.textContent = isReviewMode ? "❌ 復習モード: ON" : "❌ 復習モード: OFF";
+    el.reviewBtn.classList.toggle('bg-rose-600');
+    el.reviewBtn.classList.toggle('text-white');
+    updateFilter();
+};
+el.resetBtn.onclick = () => {
+    if(confirm("学習記録をすべて消去しますか？")) {
+        localStorage.removeItem('sf_admin_quiz_v1');
+        location.reload();
+    }
+};
 
+// 初回実行
+updateStatsDisplay();
 render();
